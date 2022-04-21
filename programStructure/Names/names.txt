@@ -1,0 +1,69 @@
+7 Rules to Names Go Programming Elements
+
+Elements
+functions, variables, contants, types, 
+statements labels, packages
+
+Rules
+
+#1.Begins with a letter (Anything Unicode deems as a letter) 
+OR
+Underscore _ 
+(Note: Name may have any number of additional letters, digits, and undderscores)
+
+#2.Case Matters:
+heapSort != Heapsort
+
+#3.Keywords cannot be used as names
+
+(Note: Go has 25 keywords )
+
+break,		default,	func,	interface,	select,
+case,		defer,		go,		map,		struct,
+chan,		else,		goto,	package,	switch
+const,		fallthrough,if,		range,		type,
+continue,	for,		import,	return,		var
+
+#4.Predeclared names are Not Reserved, so you may use them in declaration!
+!!!Beware as It might confuse the reader
+
+(Note: There are about three dozen predeclared names)
+
+Constants:
+true,	false,	iota,	nil
+
+Types:
+int,	int8,	int16,		int32,	int64,
+uint,	uint8,	uint16,		uint32,	uint64,	uintptr,
+float32,float64,complex128,	complex64,
+bool,	byte,	rune,		string,	error
+
+Functions:
+make,	len,	cap,	new,	append,	copy,	close,
+delete,	complex,real,	imag,
+panic,	recover
+
+#5 Package Level Entity 
+(Entity which declared outside function)
+
+Exported if name BEGINS with CAPITAL letter
+
+i.e It will be visible and accessible outside of its own 
+package & may be referred by other parts of program
+
+eg:Println in fmt package
+
+#6 Name Length : No LIMIT
+Convention: short names for local entity with small scope
+& and long meaningful name for entity with large scope
+
+#7 Style - "camel case"
+i.e While combining two words Interior capital letters
+are preferred over interior underscore
+eg. Right -> QuoteRuneToASCII or parseRequestLine
+ 	Wrong -> quote_rune_to_ASCII or parse_request_line
+
+Letters of Acronymns must be in same case
+eg
+Right -> htmlEscape, HTMLEscape, or escapeHTML
+Wrong -> escapeHtml
