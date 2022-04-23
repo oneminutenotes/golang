@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = "moviesapp.com/grpc/protos";
+option java_multiple_files = true;
+option java_package = "io.grpc.app1.moviesapp";
+option java_outer_classname = "MoviesAppProto";
+option objc_class_prefix = "MAP";
+
+package moviesapp;
+
+service Movie {
+	rpc GetMovies (Empty) returns (stream MovieInfo);
+	rpc GetMovie (Id) returns (MovieInfo);
+	rpc CreateMovie (MovieInfo) returns (Id);
+	rpc UpdateMovie (MovieInfo) returns (Status);
+	rpc DeleteMovie (Id) returns (Status);
+}
+
+message Empty {}
+
+message MovieInfo {
+	string id = 1;
+	string isbn = 2;
+	string title = 3;
+	Director director = 4;
+}
+
+message Director {
+	string firstname = 1;
+	string lastname = 2;
+}
+
+message Id {
+	string value = 1;
+}
+
+message Status {
+	int32 value = 1; 
+}
+
