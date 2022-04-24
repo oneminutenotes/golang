@@ -1,0 +1,6 @@
+A declaration names program entity and
+ specifies some or all its properties
+
+There are 4 major declaration types
+1.var 2.const 3.type 4.func
+
