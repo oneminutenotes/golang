@@ -1,0 +1,226 @@
+General Form
+var name type = expression
+(*note: either 'type' or '= expression' may
+	   be omitted but not both )
+
+case:
+1. type omitted: Determined by initilizer expression
+2. expression omitted: initial value is zero for type
+i.e(numbers:0 , booleans:false, strings:"", 
+	interface/reference types:nil,
+	aggregate types like array/struct:Zero value for its elements/fields
+(This ensures sensible behaviour of boundry condition as there is no such thing as uninitialized variable)
+
+eg: 
+var s string
+fmt.Println(s) // ""
+
+You can initialize set of variable in single declaration
+eg:
+var i, j, k int 				// int, int, int
+var b, f, s = true, 3.3. "one"	// bool, float64, string 
+
+A set of variable can also be initialized by calling a function that returns multiple values:
+eg:
+var f, err = os.Open(fname) // os.Open returns file,error
+_________________________________________________________
+
+1.Short Variable Declaration
+(Within a Function, used for majority of Local Variables)
+
+General Form
+name := expression
+(*note: type of name is determined by type of expression)
+
+Trends to use local 'var' declaration
+1. local variable needs explicit type that differ from initilize expression
+2. variable will be assigned value later & its initial value is unimportant
+
+eg:
+i := 100 				   // an int
+var boiling float64 = 100  // a flaot64
+var names []string
+var err error
+var p Point
+
+You can declare & initialize multiple variables
+eg:
+i, j := 0, 1
+
+(*Note: ':=' is declaration & '=' is assignment)
+	Do not confuse multi-variable declaration with
+	'tuple assignment'👇
+	eg:
+	i, j = j ,i // swap value of i & j
+
+Short variable declaration can also be used for calls 
+to a function 
+eg: 
+f, err := os.Open(infile)
+if err != nil {
+	return err
+}
+// ... use f ...
+f.Close()
+
+(*Note: short variable declaration does not necessarily declare all variables on left-hand side. 
+i.e if some were already declare in same lexical block, then short variable declaration will act as assignment)
+eg:
+in, err := os.Open(infile)
+// ...
+out, err := os.Create(outfile)
+
+(*Note: must declare at least one new variable on left)
+eg:
+f, err := os.Open(infile)
+// ...
+f, err := os.Create(outfile) // error: no new variables
+(fix 👆: use normal assignment '=')
+_________________________________________________________
+
+2. Pointers
+
+1.variable: storage containing value
+2.variables identified by name like x, x[i], x.f normally reads value, except when it is on left side of assignment it will be assigned a new value
+3.pointer: address of a variable (i.e location where value is stored)
+4.Pointer can Read/Update value of variable 'indirectly' without knowing its name
+5.
+var x int // variable is declared
+p := &x  // ("address of x") pointer to integer variable
+// p is of type *int ("pointer to int")
+// p points to x or p contains address of x
+// the var to which p points is *p (i.e *p == x)
+// *p yield the value of that variable
+// *p can be on left side of assignment to update value
+
+eg:
+x := 1
+p := &x 		// p of type *int, points to x
+fmt.Println(*p) // "1"
+*p = 2			// equivalent to x = 2
+fmt.Println(x)	// "2"
+
+6. Aggregate types (struct, array) components are also variables and thus have address. variables are addressable values
+& : operation may only be applied to addresable values
+
+7. Zero value of pointer of any type is nil
+
+8. Pointers are comparable
+equal: if & only if they points to same variable or both are nil
+eg:
+var x, y int
+fmt.Println(&x == &x, &x == &y, &x == nil) 
+//"true false false"
+
+9. Its safe for function to return address of local variable. That variable will remain in existence until it is reachable
+eg: 
+var p = f() // f() & newInt() have identical behaviour
+func f() *int {
+	return new(int)
+}
+func newInt() *int {
+	var dummy int
+	return &int
+}
+Note: Each call to f() returns distinct value
+i.e 
+fmt.Println(f() == f()) // "false"
+
+10. We can pass pointer to variable as argument in function and update that variable indirectly
+eg:
+func incr(p *int) int {
+	*p++ // increments what p points to; p remains same
+	return *p
+}
+v := 1
+incr(&v)              // side effect: v is now 2
+fmt.Println(incr(&v)) // "3" (and v is 3)
+
+11. Variable Aliases
+created each time when we take address of variable or copy a pointer
+eg: here *p is alias of v
+(note: alias can be useful as we can update variable without names. but it can also make things difficult for us. i.e to know the statement which compute on variables we must know all of its aliases)
+
+Aliases are not only created by pointers but also when we copy variables of reference types such as slices, maps & channels. And even struct, array, interface that contains these types.
+________________________________________________________
+
+3. The new function
+
+1.Expression: new(T)
+(creates unnamed variable of type T, initilizes to the zero value of T, and returns its address which is of type *T)
+eg:
+p := new(int)   // p, of type *int, points to an unnamed int variable
+fmt.Println(*p) // "0"
+*p = 2          // sets the unnamed int to 2
+fmt.Println(*p) // "2"
+
+2.new is not different from ordinary variable, just that it has no dummy name. i.e fundamentally new is not different. Its just a syntactic change to get pointer of variable without having any dummy name
+eg:
+func newInt() *int {
+    return new(int)
+}
+func newInt() *int {
+    var dummy int
+    return &dummy
+}
+
+3. Each call to new returns different address
+p := new(int)
+q := new(int)
+fmt.Println(p == q) // "false"
+(Exception: variables whose type carries no info are size zero, eg struct{}, [0]int, may depending on implementation have same address)
+
+4. Rarely used because most common unnamed variables are struct types, for which struct literal syntax is flexible
+
+5. Its Predeclared function not a keyword thus we can refine it 
+eg:
+func delta(old, new int) int { return new - old }
+(note: within delta built-in new func is unavailable)
+________________________________________________________
+
+4. Lifetime of Variables 
+
+1. The lifetime of variable is interval of time during which it exists as the program executes.
+In short it lives until it is reachable
+
+package level variable: entire execution of program
+
+local variable: dynamic lifetime 
+(new instance created with each declaration, and variable lives until it becomes 'unreachable'. after that variable is recycled)
+(functional parameters & results are also local varaibles, they are created each time their function gets called)
+
+eg:
+for i := 0; i < 10 ; i++ {
+	x := i * i
+	fmt.Println("square of %d: %d", i, x)
+}
+(here i is created each time for loop begins, 
+and x is created on each iteration of loop)
+
+2. How garbage collector determines when to reclaim variable storage?
+Every variable(package level or local) can be a start or root of a path (i.e it references storage) to the variable in question. 
+Then pointers and copy can create other types of references to the same variable. 
+If no such path exist then variable becomes unreachable & can no longer affect computation. Then it is recycled.
+
+3. How compiler determines whether to allocate variables on heap or stack
+(this choice is not determined by wheather var or new is used for declartion)
+Lets look at an example
+eg 1
+var global *int
+func f() {
+	var x int
+	x = 1
+	global = &x
+}
+eg 2
+func g() {
+	y := new(int)
+	*y = 1 
+}
+conclusion:
+x : heap allocated because 'x escapes from f'
+y : stack allocated as 'y does not escape from g'
+
+i.e x is still reachable from global variable even after function is returned
+y becomes unreachable and can be recycled
+
